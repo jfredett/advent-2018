@@ -1,30 +1,42 @@
 use std::collections::HashMap;
 
-pub type BoxID = HashMap<char, u64>;
+//pub type BoxID = HashMap<char, u64>;
 
-#[aoc_generator(day2)]
-pub fn input_generator(input: &str) -> Vec<BoxID> {
-    input.lines().map(|l| {
+#[derive(PartialEq, Eq, Debug, Clone)]
+pub struct BoxID {
+    hash : HashMap<char, u64>,
+    source : String
+}
+
+impl BoxID {
+    pub fn new(input: &str) -> BoxID {
         let mut box_id = HashMap::new();
-        for c in l.trim().chars() {
+        for c in input.trim().chars() {
             let letter_count = box_id.entry(c).or_insert(0);
             *letter_count += 1
         }
-        box_id
-    }).collect()
-}
-
-pub fn signature(boxid: BoxID) -> (bool,bool) {
-    let mut two_flag = false;
-    let mut three_flag = false;
-
-    for (_,v) in boxid {
-        two_flag   |= v == 2;
-        three_flag |= v == 3;
+        BoxID { hash: box_id, source: String::from(input) }
     }
 
-    return (two_flag, three_flag);
+    pub fn signature(&self) -> (bool,bool) {
+        let mut two_flag = false;
+        let mut three_flag = false;
+
+        for (_,v) in &self.hash {
+            two_flag   |= *v == 2;
+            three_flag |= *v == 3;
+        }
+
+        return (two_flag, three_flag);
+    }
 }
+
+
+#[aoc_generator(day2)]
+pub fn input_generator(input: &str) -> Vec<BoxID> {
+    input.lines().map(|l| { BoxID::new(l) }).collect()
+}
+
 
 #[aoc(day2, part1)]
 pub fn solution(input: &Vec<BoxID>) -> i64 {
@@ -32,7 +44,7 @@ pub fn solution(input: &Vec<BoxID>) -> i64 {
     let mut three_boxes = 0;
 
     for b in input {
-        match signature(b.clone()) {
+        match b.signature() {
             (true, true)   => { two_boxes +=1; three_boxes +=1 },
             (true, false)  => { two_boxes +=1; },
             (false, true)  => { three_boxes +=1; },
@@ -57,7 +69,7 @@ mod tests {
         let gen_input = input_generator(example);
         let input = gen_input.get(0).unwrap();
 
-        assert_eq!(input.get(&'a'), Some(&1u64));
+        assert_eq!(input.hash.get(&'a'), Some(&1u64));
     }
 
     #[test]
@@ -66,8 +78,8 @@ mod tests {
         let gen_input = input_generator(example);
         let input = gen_input.get(0).unwrap();
 
-        assert_eq!(input.get(&'a'), Some(&2u64));
-        assert_eq!(input.get(&'b'), Some(&3u64));
+        assert_eq!(input.hash.get(&'a'), Some(&2u64));
+        assert_eq!(input.hash.get(&'b'), Some(&3u64));
     }
 
     #[test]
