@@ -18,6 +18,43 @@ impl BoxID {
         BoxID { hash: box_id, source: String::from(input) }
     }
 
+    pub fn diff_count(&self, input: &BoxID) -> u64 {
+        let mut count = 0;
+        for idx in 0..self.source.len() {
+            if self.source.get(idx..idx+1) != input.source.get(idx..idx+1) {
+                count += 1;
+            }
+        }
+
+        return count;
+    }
+
+    pub fn eliminate_differences(&self, input: &BoxID) -> String {
+        let mut result = String::new();
+
+        let mut left_chars = self.source.chars();
+        let mut right_chars = input.source.chars();
+
+        loop {
+            let left_char = left_chars.next();
+            let right_char = right_chars.next();
+
+            if left_char.is_none() || right_char.is_none() { return result; }
+
+            if left_char == right_char { result.push(left_char.unwrap()); }
+        }
+
+
+        //for idx in 0..self.source.len() {
+            //if self.source.get(idx..idx+1) != input.source.get(idx..idx+1) {
+                //let ch = self.source.chars().get(idx);
+                //result.push(String::from(ch));
+            //}
+        //}
+
+        //return result;
+    }
+
     pub fn signature(&self) -> (bool,bool) {
         let mut two_flag = false;
         let mut three_flag = false;
@@ -55,8 +92,17 @@ pub fn solution(input: &Vec<BoxID>) -> i64 {
 }
 
 #[aoc(day2, part2)]
-pub fn solution2(input: &Vec<BoxID>) -> i64 {
-    return 0;
+pub fn solution2(input: &Vec<BoxID>) -> String {
+    for i in 0..input.len() {
+        let left = input.get(i).unwrap();
+        for j in i+1..input.len() {
+            let right = input.get(j).unwrap();
+            if left.diff_count(right) == 1 {
+                return left.eliminate_differences(right);
+            }
+        }
+    }
+    panic!("Could not find single-difference in set");
 }
 
 #[cfg(test)]
@@ -90,4 +136,11 @@ mod tests {
         assert_eq!(solution(&gen_input), 12);
     }
 
+    #[test]
+    fn part2_example_checksum() {
+        let examples = "abcde\nfghij\nklmno\npqrst\nfguij\naxcye\nwvxyz";
+        let gen_input = input_generator(examples);
+
+        assert_eq!(solution2(&gen_input), "fgij");
+    }
 }
