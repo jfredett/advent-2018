@@ -1,0 +1,12 @@
+[package]
+name = "advent-2018"
+version = "0.1.0"
+authors = ["Joe Fredette <jfredett@gmail.com>"]
+edition = "2018"
+
+[lib]
+bench = false
+
+[dependencies]
+aoc-runner = "0.1.0"
+aoc-runner-derive = "0.1.3"
