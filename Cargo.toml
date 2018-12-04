@@ -10,3 +10,4 @@ bench = false
 [dependencies]
 aoc-runner = "0.1.0"
 aoc-runner-derive = "0.1.4"
+nom = "^4.1"
